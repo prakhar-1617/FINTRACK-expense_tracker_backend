@@ -99,4 +99,43 @@ router.put('/profile', protect, async (req, res) => {
   }
 });
 
+// @route   POST /api/auth/contacts
+// @desc    Add a contact to user's saved list
+router.post('/contacts', protect, async (req, res) => {
+  try {
+    const { name, email } = req.body;
+    const user = await User.findById(req.user._id);
+    
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Check if contact already exists
+    if (user.contacts.some(c => c.email.toLowerCase() === email.toLowerCase())) {
+      return res.status(400).json({ message: 'Contact already exists' });
+    }
+
+    user.contacts.push({ name, email });
+    await user.save();
+    
+    res.json(user.contacts);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// @route   DELETE /api/auth/contacts/:email
+// @desc    Remove a contact from user's saved list
+router.delete('/contacts/:email', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.contacts = user.contacts.filter(c => c.email.toLowerCase() !== req.params.email.toLowerCase());
+    await user.save();
+
+    res.json(user.contacts);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router;

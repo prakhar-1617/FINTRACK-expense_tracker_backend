@@ -32,6 +32,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    contacts: [{
+      name: String,
+      email: String,
+    }],
   },
   { timestamps: true }
 );

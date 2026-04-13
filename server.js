@@ -9,7 +9,13 @@ connectDB();
 const app = express();
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: [
+    process.env.FRONTEND_URL, 
+    'http://localhost:5173', 
+    'http://localhost:5174',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:5174'
+  ].filter(Boolean),
   credentials: true,
 }));
 app.use(express.json());
@@ -20,6 +26,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/transactions', require('./routes/transactions'));
 app.use('/api/budget', require('./routes/budget'));
 app.use('/api/ai', require('./routes/ai'));
+app.use('/api/splits', require('./routes/splits'));
 
 // Health check
 app.get('/api/health', (req, res) => {
